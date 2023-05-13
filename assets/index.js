@@ -14,18 +14,34 @@ var uDevice;
 //  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
 //      .then(handleSuccess);
 
+
+const logger = new Vue({
+    el: '#logger',
+    data() {
+        return {
+            loggers: []
+        }
+    },
+    methods: {
+        log() {
+            // const message = 
+        }
+    }
+})
+
+
 document
   .querySelector("#request-aoa")
   .addEventListener("click", function (event) {
     navigator.usb
       .requestDevice({
         filters: [
-          { vendorId: 0x18d1, productId: 0x2d00 },
-          { vendorId: 0x18d1, productId: 0x2d01 },
-          { vendorId: 0x18d1, productId: 0x2d02 },
-          { vendorId: 0x18d1, productId: 0x2d03 },
-          { vendorId: 0x18d1, productId: 0x2d04 },
-          { vendorId: 0x18d1, productId: 0x2d05 },
+        //   { vendorId: 0x18d1, productId: 0x2d00 },
+        //   { vendorId: 0x18d1, productId: 0x2d01 },
+        //   { vendorId: 0x18d1, productId: 0x2d02 },
+        //   { vendorId: 0x18d1, productId: 0x2d03 },
+        //   { vendorId: 0x18d1, productId: 0x2d04 },
+        //   { vendorId: 0x18d1, productId: 0x2d05 },
         ],
       })
       .then((usbDevice) => {
@@ -45,6 +61,7 @@ document
       .then((usbDevice) => {
         console.log("Product name: " + usbDevice.productName);
         connect(usbDevice);
+        console.log('devices: ', usbDevice)
       })
       .catch((e) => {
         console.log("There is no device. " + e);
@@ -171,6 +188,7 @@ function switchToAoA(usbDevice) {
       new ArrayBuffer(0)
     )
     .then((response) => {
+        console.log("Switch to AoA", response.status);
       if (response.status == "ok") {
         usbDevice.close();
       }
