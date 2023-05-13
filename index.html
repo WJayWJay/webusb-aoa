@@ -1,34 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>WebUSBChat</title>
-    <script src="https://cdn.staticfile.org/vConsole/3.15.0/vconsole.min.js">
+  <head>
+    <title>WebUSB with android aoa</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
 
+    <script src="https://cdn.staticfile.org/vConsole/3.15.0/vconsole.min.js"></script>
+  </head>
+  <body style="text-align: center">
+    <div style="display: inline-block; vertical-align: middle">
+      <div>
+        <button id="request-aoa" style="margin: 1px">Connect</button>
+        <button id="request-any" style="margin: 1px">Switch to AoA</button>
+        <input
+          id="audio-support"
+          type="checkbox"
+          name="audio"
+          style="display: none"
+        />
+        <!-- Audio Support<br> -->
+      </div>
+      <div>
+        <input id="text-inpt" type="text" style="margin: 2px" />
+        <button id="send" style="margin: 2px">Send</button>
+      </div>
+      <textarea
+        readonly
+        id="chat-area"
+        rows="16"
+        cols="28"
+        style="resize: none"
+      ></textarea
+      ><br />
+      <audio id="player" controls style="display: none"></audio>
+    </div>
+
+    <script type="text/javascript">
+      var vConsole = new window.VConsole();
+      var st = document.createElement("script");
+      st.src = "./assets/index.js?" + Date.now();
+
+      document.body.appendChild(st);
     </script>
-</head>
-<body style="text-align: center;">
-	
-<div style="display: inline-block; vertical-align: middle;">
-	<div>
-		<button id="request-aoa" style=" margin: 1px"> Connect</button>
-		<button id="request-any" style="margin: 1px"> Switch to AoA</button>
-		<input  id="audio-support" type="checkbox" name="audio" style="display: none;"> <!-- Audio Support<br> -->
- 	</div>
-	<div>
-		<input  id="text-inpt" type="text" style="margin: 2px"> 
-		<button id="send" style="margin: 2px">Send</button>
-	</div>
-	<textarea readonly id="chat-area" rows="16" cols="28" style="resize: none;"></textarea><br> 
-	<audio id="player" controls style="display: none;"></audio>
-</div>	
-
-<script type="text/javascript">
-    var vConsole = new window.VConsole();
-    var st = document.createElement('script')
-    st.src = './assets/index.js?' + Date.now()
-
-    document.body.appendChild(st)
-</script>
-
-</body>
+  </body>
 </html>
