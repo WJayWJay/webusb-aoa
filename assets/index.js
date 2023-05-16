@@ -243,6 +243,7 @@ const app = new Vue({
   data() {
       return {
           loggers: [],
+          hasPort: false,
           port: {},
           portInfo: {}
       }
@@ -276,6 +277,7 @@ const app = new Vue({
         const ports = await window.navigator.serial.requestPort()
         console.log('ports', ports)
         this.port = ports
+        this.hasPort = true
       },
       log() {
           // const message = 
