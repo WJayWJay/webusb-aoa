@@ -15,21 +15,6 @@ var uDevice;
 //      .then(handleSuccess);
 
 
-const logger = new Vue({
-    el: '#logger',
-    data() {
-        return {
-            loggers: []
-        }
-    },
-    methods: {
-        log() {
-            // const message = 
-        }
-    }
-})
-
-
 document
   .querySelector("#request-aoa")
   .addEventListener("click", function (event) {
@@ -249,3 +234,51 @@ document.querySelector("#send").addEventListener("click", function (event) {
       console.log("Can't send " + e);
     });
 });
+
+
+
+
+const app = new Vue({
+  el: '#vueapp',
+  data() {
+      return {
+          loggers: [],
+          port: {},
+          portInfo: {}
+      }
+  },
+  mounted() {
+    console.log('navigator', window.navigator)
+
+    this.onUsbConnect()
+    this.onSrialConnect()
+  },
+  methods: {
+      onSrialConnect() {
+        navigator.serial.onconnect = function (...args) {
+          console.log('serial', args)
+        }
+      },
+      onUsbConnect() {
+        navigator.usb.onconnect = function (...args) {
+          console.log('usb devices', args)
+        }
+      },
+
+      async connectSerial() {
+        if (this.port && this.port.getInfo) {
+          this.portInfo = await this.port.getInfo();
+        } else {
+          await this.requestSerial()
+        }
+      },
+      async requestSerial() {
+        const ports = await window.navigator.serial.requestPort()
+        console.log('ports', ports)
+        this.port = ports
+      },
+      log() {
+          // const message = 
+      }
+  }
+})
