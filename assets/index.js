@@ -254,8 +254,14 @@ const app = new Vue({
     this.onUsbConnect()
     this.onSrialConnect()
   },
+  computed: {
+    isSupportSerial() {
+      return !!window.navigator.serial
+    }
+  },
   methods: {
       onSrialConnect() {
+        if (!this.isSupportSerial) return
         navigator.serial.onconnect = function (...args) {
           console.log('serial', args)
         }
@@ -274,6 +280,8 @@ const app = new Vue({
         }
       },
       async requestSerial() {
+        if (!this.isSupportSerial) return
+
         const ports = await window.navigator.serial.requestPort()
         console.log('ports', ports)
         this.port = ports
