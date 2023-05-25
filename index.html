@@ -7,15 +7,18 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
     />
 
+    <link rel="stylesheet" href="https://cdn.staticfile.org/element-ui/2.15.13/theme-chalk/index.min.css">
     <script src="https://cdn.staticfile.org/vConsole/3.15.0/vconsole.min.js"></script>
     <script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/element-ui/2.15.13/index.min.js"></script>
+    
   </head>
   <body style="text-align: center">
     <div id="vueapp">
       <div style="display: inline-block; vertical-align: middle">
         <div>
-          <button id="request-aoa" style="margin: 1px">Connect</button>
-          <button id="request-any" style="margin: 1px">Switch to AoA</button>
+          <el-button @click="reqAoa" id="request-aoa" style="margin: 1px">Connect</el-button>
+          <el-button @click="reqUsbAny" id="request-any" style="margin: 1px">Switch to AoA</el-button>
           <input
             id="audio-support"
             type="checkbox"
@@ -26,7 +29,7 @@
         </div>
         <div>
           <input id="text-inpt" type="text" style="margin: 2px" />
-          <button id="send" style="margin: 2px">Send</button>
+          <el-button id="send" style="margin: 2px">Send</el-button>
         </div>
         <textarea
           readonly
@@ -41,13 +44,51 @@
         <div id="logger"></div>
       </div>
 
-      <button @click="requestSerial">request serial</button>
-      <button @click="connectSerial">connect serial</button>
+      <div>
+        <el-button @click="requestSerial">request serial</el-button>
+        <el-button @click="connectSerial">connect serial</el-button>
 
-      <button @click="changeRequestType">
-        changeRequestType {{ requestType }}
-      </button>
-      <div>Has Port: {{ hasPort }}</div>
+        <el-button @click="changeRequestType">
+          changeRequestType {{ requestType }}
+        </el-button>
+        <div>Has Port: {{ hasPort }}</div>
+
+        <div>
+            <el-row>
+              <el-col :span="4">
+                <el-tag>recipient</el-tag>
+              </el-col>
+              <el-col :span="20">
+                <el-radio v-model="recipient" :label="0" border>DEVICE</el-radio>
+                <el-radio v-model="recipient" :label="1" border>INTERFACE</el-radio>
+                <el-radio v-model="recipient" :label="2" border>ENDPOINT</el-radio>
+                <el-radio v-model="recipient" :label="3" border>OTHER</el-radio>
+              </el-col>
+          </el-row>
+
+            <!-- <el-radio-group v-model="recipient">
+              <el-radio-button name="device" :label="0"></el-radio-button>
+              <el-radio-button :label="1"></el-radio-button>
+              <el-radio-button :label="2"></el-radio-button>
+              <el-radio-button :label="3"></el-radio-button>
+            </el-radio-group> -->
+
+          <el-row>
+            <!-- <el-col>
+              <el-tag>requestType</el-tag>
+              <el-radio v-model="requestType" :label="0" border>主机向设备</el-radio>
+              <el-radio v-model="requestType" :label="1" border>设备至主机</el-radio>
+            </el-col> -->
+            
+            <el-tag>requestType</el-tag>
+            <el-radio-group v-model="requestType">
+              <el-radio-button name="device" :label="0"></el-radio-button>
+              <el-radio-button :label="1"></el-radio-button>
+            </el-radio-group>
+          <el-row>
+
+        </div>
+      </div>
     </div>
 
     <script type="text/javascript">

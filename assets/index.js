@@ -19,54 +19,45 @@ var uDevice;
 // 1 = 设备至主机
 let requestType = 0
 // device, interface, endpoint, or other.
-let recipient = 'device'
+// #define 	USB_SETUP_RECIPIENT_DEVICE   0x00
+ 
+// #define 	USB_SETUP_RECIPIENT_INTERFACE   0x01
+ 
+// #define 	USB_SETUP_RECIPIENT_ENDPOINT   0x02
+ 
+// #define 	USB_SETUP_RECIPIENT_OTHER   0x03
+let recipient = 0
 
-document
-  .querySelector("#request-aoa")
-  .addEventListener("click", async function (event) {
-    const device = await navigator.usb
-      .requestDevice({
-        filters: [
-        //   { vendorId: 0x18d1, productId: 0x2d00 },
-        //   { vendorId: 0x18d1, productId: 0x2d01 },
-        //   { vendorId: 0x18d1, productId: 0x2d02 },
-        //   { vendorId: 0x18d1, productId: 0x2d03 },
-        //   { vendorId: 0x18d1, productId: 0x2d04 },
-        //   { vendorId: 0x18d1, productId: 0x2d05 },
-        ],
-      })
-      .then((usbDevice) => {
-        console.log("Product name: " + usbDevice.productName);
-        return usbDevice
-      })
-      .catch((e) => {
-        console.log("There is no aoa device. " + e);
-      });
+// document
+//   .querySelector("#request-aoa")
+//   .addEventListener("click", async function (event) {
+//     const device = await navigator.usb
+//       .requestDevice({
+//         filters: [
+//         //   { vendorId: 0x18d1, productId: 0x2d00 },
+//         //   { vendorId: 0x18d1, productId: 0x2d01 },
+//         //   { vendorId: 0x18d1, productId: 0x2d02 },
+//         //   { vendorId: 0x18d1, productId: 0x2d03 },
+//         //   { vendorId: 0x18d1, productId: 0x2d04 },
+//         //   { vendorId: 0x18d1, productId: 0x2d05 },
+//         ],
+//       })
+//       .then((usbDevice) => {
+//         console.log("Product name: " + usbDevice.productName);
+//         return usbDevice
+//       })
+//       .catch((e) => {
+//         console.log("There is no aoa device. " + e);
+//       });
 
-      await setupPipes(usbDevice);
+//       await setupPipes(usbDevice);
 
-      await subscribeForRead();
-  });
+//       await subscribeForRead();
+//   });
 
-document
-  .querySelector("#request-any")
-  .addEventListener("click", async function (event) {
-    const usbDevice = await navigator.usb
-      .requestDevice({ filters: [] })
-      .then((usbDevice) => {
-        console.log("Product name: " + usbDevice.productName);
-        
-        console.log('devices: ', usbDevice)
-        return usbDevice
-      })
-      .catch((e) => {
-        console.log("There is no device. " + e);
-      });
-    if (!usbDevice) return
-    await connect(usbDevice);
-    await checkProtocol(usbDevice);
-    await setCredentials(usbDevice);
-  });
+// document
+//   .querySelector("#request-any")
+//   .addEventListener("click", ;
 
 async function connect(usbDevice) {
   await usbDevice
@@ -127,6 +118,7 @@ async function setCredentials(usbDevice) {
     "WebUsbChat",
     "desCripTion",
     "1.0",
+    "2.0",
     "uRi",
     "seRialNuMbeR",
   ];
@@ -249,8 +241,6 @@ document.querySelector("#send").addEventListener("click", function (event) {
 });
 
 
-
-
 const app = new Vue({
   el: '#vueapp',
   data() {
@@ -259,6 +249,7 @@ const app = new Vue({
           hasPort: false,
           port: {},
           portInfo: {},
+          recipient,
           requestType: requestType
       }
   },
@@ -271,6 +262,14 @@ const app = new Vue({
   computed: {
     isSupportSerial() {
       return !!window.navigator.serial
+    }
+  },
+  watch: {
+    recipient(v) {
+      recipient = v
+    },
+    requestType(v) {
+      requestType = v
     }
   },
   methods: {
@@ -307,6 +306,50 @@ const app = new Vue({
       },
       log() {
           // const message = 
+      },
+      async reqUsbAny(event) {
+        const usbDevice = await navigator.usb
+          .requestDevice({ filters: [] })
+          .then((usbDevice) => {
+            console.log("Product name: " + usbDevice.productName);
+            
+            console.log('devices: ', usbDevice)
+            return usbDevice
+          })
+          .catch((e) => {
+            console.log("There is no device. " + e);
+          });
+        if (!usbDevice) return
+        await connect(usbDevice);
+        await checkProtocol(usbDevice);
+        await setCredentials(usbDevice);
+      },
+      async reqAoa() {
+
+        const device = await navigator.usb
+        .requestDevice({
+          filters: [
+          //   { vendorId: 0x18d1, productId: 0x2d00 },
+          //   { vendorId: 0x18d1, productId: 0x2d01 },
+          //   { vendorId: 0x18d1, productId: 0x2d02 },
+          //   { vendorId: 0x18d1, productId: 0x2d03 },
+          //   { vendorId: 0x18d1, productId: 0x2d04 },
+          //   { vendorId: 0x18d1, productId: 0x2d05 },
+          ],
+        })
+        .then((usbDevice) => {
+          console.log("Product name: " + usbDevice.productName);
+          return usbDevice
+        })
+        .catch((e) => {
+          console.log("There is no aoa device. " + e);
+        });
+
+        if (!device) return
+
+        await setupPipes(usbDevice);
+
+        await subscribeForRead();
       }
   }
 })
