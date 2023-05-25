@@ -14,11 +14,17 @@ var uDevice;
 //  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
 //      .then(handleSuccess);
 
+// 传输方向 vendor
+// 0 = 主机向设备
+// 1 = 设备至主机
+let requestType = 0
+// device, interface, endpoint, or other.
+let recipient = 'device'
 
 document
   .querySelector("#request-aoa")
-  .addEventListener("click", function (event) {
-    navigator.usb
+  .addEventListener("click", async function (event) {
+    const device = await navigator.usb
       .requestDevice({
         filters: [
         //   { vendorId: 0x18d1, productId: 0x2d00 },
@@ -31,51 +37,59 @@ document
       })
       .then((usbDevice) => {
         console.log("Product name: " + usbDevice.productName);
-        setupPipes(usbDevice);
+        return usbDevice
       })
       .catch((e) => {
         console.log("There is no aoa device. " + e);
       });
+
+      await setupPipes(usbDevice);
+
+      await subscribeForRead();
   });
 
 document
   .querySelector("#request-any")
-  .addEventListener("click", function (event) {
-    navigator.usb
+  .addEventListener("click", async function (event) {
+    const usbDevice = await navigator.usb
       .requestDevice({ filters: [] })
       .then((usbDevice) => {
         console.log("Product name: " + usbDevice.productName);
-        connect(usbDevice);
+        
         console.log('devices: ', usbDevice)
+        return usbDevice
       })
       .catch((e) => {
         console.log("There is no device. " + e);
       });
+    if (!usbDevice) return
+    await connect(usbDevice);
+    await checkProtocol(usbDevice);
+    await setCredentials(usbDevice);
   });
 
-function connect(usbDevice) {
-  usbDevice
+async function connect(usbDevice) {
+  await usbDevice
     .open()
     .then(function () {
       console.log("connected");
-      checkProtocol(usbDevice);
     })
     .catch((e) => {
       console.log("Can't connect " + e);
     });
 }
 
-function checkProtocol(usbDevice) {
+async function checkProtocol(usbDevice) {
 //   if (usbDevice.configuration === null)
-    usbDevice
+    return await usbDevice
       .selectConfiguration(1)
       .then(function () {
         console.log('send data')
         usbDevice
           .controlTransferIn(
             {
-              requestType: "vendor",
-              recipient: "device",
+              requestType: requestType,
+              recipient: recipient,
               request: 51,
               value: 0,
               index: 0,
@@ -86,7 +100,7 @@ function checkProtocol(usbDevice) {
             console.log("Check protocol status:", response.data, response.status);
             if (response.data.getInt8(0) == 2) {
               console.log("AoA2 available");
-              setCredentials(usbDevice);
+              return true
             }
           })
           .catch((e) => {
@@ -120,8 +134,8 @@ async function setCredentials(usbDevice) {
     let cred = new TextEncoder().encode(credetials[i]);
     await usbDevice.controlTransferOut(
       {
-        requestType: "vendor",
-        recipient: "device",
+        requestType: requestType,
+        recipient: recipient,
         request: 52,
         value: 0,
         index: i,
@@ -141,8 +155,8 @@ function setupAudio(usbDevice) {
   usbDevice
     .controlTransferOut(
       {
-        requestType: "vendor",
-        recipient: "device",
+        requestType: requestType,
+        recipient: recipient,
         request: 58,
         value: 1,
         index: 0,
@@ -164,8 +178,8 @@ function switchToAoA(usbDevice) {
   usbDevice
     .controlTransferOut(
       {
-        requestType: "vendor",
-        recipient: "device",
+        requestType: requestType,
+        recipient: recipient,
         request: 53,
         value: 0,
         index: 0,
@@ -173,7 +187,7 @@ function switchToAoA(usbDevice) {
       new ArrayBuffer(0)
     )
     .then((response) => {
-        console.log("Switch to AoA", response.status);
+        console.log("Switch to AoA", response, response.status);
       if (response.status == "ok") {
         usbDevice.close();
       }
@@ -195,7 +209,6 @@ async function setupPipes(usbDevice) {
     }
   }
   uDevice = usbDevice;
-  subscribeForRead();
 }
 
 function subscribeForRead() {
@@ -206,7 +219,7 @@ function subscribeForRead() {
         null,
         new Uint8Array(response.data.buffer)
       );
-      console.log(str_response);
+      console.log('str_response', str_response);
       var n = str_response.indexOf(String.fromCharCode(0));
       console.log(str_response.substring(0, n));
       var chatText = document.querySelector("#chat-area").value;
@@ -245,7 +258,8 @@ const app = new Vue({
           loggers: [],
           hasPort: false,
           port: {},
-          portInfo: {}
+          portInfo: {},
+          requestType: requestType
       }
   },
   mounted() {
@@ -260,6 +274,10 @@ const app = new Vue({
     }
   },
   methods: {
+      changeRequestType() {
+        this.requestType = this.requestType ? 0 : 1
+        requestType = this.requestType
+      },
       onSrialConnect() {
         if (!this.isSupportSerial) return
         navigator.serial.onconnect = function (...args) {
