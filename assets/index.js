@@ -28,6 +28,8 @@ let requestType = 0
 // #define 	USB_SETUP_RECIPIENT_OTHER   0x03
 let recipient = 0
 
+let credetials = []
+
 // document
 //   .querySelector("#request-aoa")
 //   .addEventListener("click", async function (event) {
@@ -113,15 +115,15 @@ function str2ab(str) {
 }
 
 async function setCredentials(usbDevice) {
-  let credetials = [
-    "once2go",
-    "WebUsbChat",
-    "desCripTion",
-    "1.0",
-    "2.0",
-    "uRi",
-    "seRialNuMbeR",
-  ];
+  // let credetials = [
+  //   "once2go",
+  //   "WebUsbChat",
+  //   "desCripTion",
+  //   "1.0",
+  //   "uri",
+  //   "seRialNuMbeR",
+  // ];
+
   for (var i = 0; i < credetials.length; i++) {
     let cred = new TextEncoder().encode(credetials[i]);
     await usbDevice.controlTransferOut(
@@ -250,7 +252,15 @@ const app = new Vue({
           port: {},
           portInfo: {},
           recipient,
-          requestType: requestType
+          requestType: requestType,
+          credetials: [
+            { name: 'manufacturer', val: ''},
+            { name: 'model', val: ''},
+            { name: 'description', val: ''},
+            { name: 'version', val: '2.0'},
+            { name: 'uri', val: 'uri'},
+            { name: 'serial', val: ''},
+          ]
       }
   },
   mounted() {
@@ -270,6 +280,16 @@ const app = new Vue({
     },
     requestType(v) {
       requestType = v
+    },
+    credetials: {
+      deep:true,
+      handler(v){
+        const cs = []
+        this.credetials.map(i => {
+          cs.push(i.val)
+        })
+        credetials = cs
+      }
     }
   },
   methods: {

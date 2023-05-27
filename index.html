@@ -44,6 +44,13 @@
         <div id="logger"></div>
       </div>
 
+      <el-row>credetials</el-row>
+      <el-row>
+        <el-col v-for="i in credetials" :key="i.name" :span="4">
+          {{ i.name }} <el-input :name="i.name" v-model="i.val" clearable />
+        </el-col>
+      </el-row>
+
       <div>
         <el-button @click="requestSerial">request serial</el-button>
         <el-button @click="connectSerial">connect serial</el-button>
