@@ -44,6 +44,10 @@
         <div id="logger"></div>
       </div>
 
+
+      <el-row>
+        <el-button @click="toLogUsb">log device info</el-button>
+      </el-row>
       <el-row>credetials</el-row>
       <el-row>
         <el-col v-for="i in credetials" :key="i.name" :span="4">
@@ -66,10 +70,7 @@
                 <el-tag>recipient</el-tag>
               </el-col>
               <el-col :span="20">
-                <el-radio v-model="recipient" :label="0" border>DEVICE</el-radio>
-                <el-radio v-model="recipient" :label="1" border>INTERFACE</el-radio>
-                <el-radio v-model="recipient" :label="2" border>ENDPOINT</el-radio>
-                <el-radio v-model="recipient" :label="3" border>OTHER</el-radio>
+                <el-radio v-for="i in recipientList" v-model="recipient" :label="i.name" border>{{ i.name }}</el-radio>
               </el-col>
           </el-row>
 

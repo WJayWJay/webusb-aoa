@@ -17,7 +17,8 @@ var uDevice;
 // 传输方向 vendor
 // 0 = 主机向设备
 // 1 = 设备至主机
-let requestType = 0
+// vendor class standard
+let requestType = 'vendor'
 // device, interface, endpoint, or other.
 // #define 	USB_SETUP_RECIPIENT_DEVICE   0x00
  
@@ -26,7 +27,7 @@ let requestType = 0
 // #define 	USB_SETUP_RECIPIENT_ENDPOINT   0x02
  
 // #define 	USB_SETUP_RECIPIENT_OTHER   0x03
-let recipient = 0
+let recipient = 'device'
 
 let credetials = []
 
@@ -247,6 +248,16 @@ const app = new Vue({
   el: '#vueapp',
   data() {
       return {
+          // device, interface, endpoint, or other
+          recipientList: [
+            { name: 'device' },
+            { name: 'interface' },
+            { name: 'endpoint' },
+            { name: 'other' },
+          ],
+          requestTypeList: [
+            { name: 'vendor' },
+          ],
           loggers: [],
           hasPort: false,
           port: {},
@@ -260,7 +271,9 @@ const app = new Vue({
             { name: 'version', val: '2.0'},
             { name: 'uri', val: 'uri'},
             { name: 'serial', val: ''},
-          ]
+          ],
+
+          usbDevice: null,
       }
   },
   mounted() {
@@ -324,6 +337,19 @@ const app = new Vue({
         this.port = ports
         this.hasPort = true
       },
+      toLogUsb() {
+        const usbDevice = this.usbDevice
+        if (!usbDevice) {
+          console.log('not connected device')
+          return
+        }
+        console.warn('------usbDevice header ------')
+        console.log(usbDevice)
+        for (const i in usbDevice) {
+          console.log('usb: ', i, '=', usbDevice[i])
+        }
+        console.warn('********usbDevice end ------')
+      },
       log() {
           // const message = 
       },
@@ -334,12 +360,16 @@ const app = new Vue({
             console.log("Product name: " + usbDevice.productName);
             
             console.log('devices: ', usbDevice)
+            // console.table(usbDevice)
+
             return usbDevice
           })
           .catch((e) => {
             console.log("There is no device. " + e);
           });
+        
         if (!usbDevice) return
+        this.usbDevice = usbDevice
         await connect(usbDevice);
         await checkProtocol(usbDevice);
         await setCredentials(usbDevice);
